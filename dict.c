@@ -20,6 +20,11 @@ uint16_t *dict_find(dict_node_t *head, pair_t key)
 		return dict_find(head->right, key);
 }
 
+static int max(int x, int y)
+{
+	return (x > y ? x : y);
+}
+
 static void rotate_left(dict_node_t **head)
 {
 	dict_node_t *old_head = head[0];
@@ -30,14 +35,13 @@ static void rotate_left(dict_node_t **head)
 	head[0] = new_head;
 	new_head->left = old_head;
 
-	if(head[0]->right)
-		head[0]->right->height =
-			(head[0]->right->left ? head[0]->right->left->height : 0)
-			- (head[0]->right->right ? head[0]->right->right->height : 0);
+	old_head->height =
+		max(old_head->left ? old_head->left->height : 0
+			, old_head->right ? old_head->right->height : 0) + 1;
 
-	head[0]->height =
-		(head[0]->left ? head[0]->left->height : 0)
-			- (head[0]->right ? head[0]->right->height : 0);
+	new_head->height =
+		max(new_head->left ? new_head->left->height : 0
+			, new_head->right ? new_head->right->height : 0) + 1;
 }
 
 static void rotate_right(dict_node_t **head)
@@ -50,14 +54,13 @@ static void rotate_right(dict_node_t **head)
 	head[0] = new_head;
 	new_head->right = old_head;
 
-	if(head[0]->left)
-		head[0]->left->height =
-			(head[0]->left->left ? head[0]->left->left->height : 0)
-			- (head[0]->left->right ? head[0]->left->right->height : 0);
+	old_head->height =
+		max(old_head->left ? old_head->left->height : 0
+			, old_head->right ? old_head->right->height : 0) + 1;
 
-	head[0]->height =
-		(head[0]->left ? head[0]->left->height : 0)
-			- (head[0]->right ? head[0]->right->height : 0);
+	new_head->height =
+		max(new_head->left ? new_head->left->height : 0
+			, new_head->right ? new_head->right->height : 0) + 1;
 }
 
 int dict_insert(dict_node_t **head, pair_t key, uint16_t value)
@@ -138,7 +141,7 @@ void dict_print(dict_node_t *head, int depth)
 {
 	if(head == NULL) return;
 
-	printf("%*c%.*s = %d\n", depth * 2, 0, (int)head->key.size, (char *)head->key.str, head->value);
+	printf("%*c %d:%.*s = %d\n", depth * 2, 0, head->height, (int)head->key.size, (char *)head->key.str, head->value);
 
 	dict_print(head->left, depth + 1);
 	dict_print(head->right, depth + 1);
