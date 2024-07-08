@@ -1,5 +1,5 @@
-#ifndef _LZW_H_
-#define _LZW_H_
+#ifndef _DICT_H_
+#define _DICT_H_
 
 #include <stdint.h>
 

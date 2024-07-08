@@ -141,7 +141,7 @@ void dict_print(dict_node_t *head, int depth)
 {
 	if(head == NULL) return;
 
-	printf("%*c %d:%.*s = %d\n", depth * 2, 0, head->height, (int)head->key.size, (char *)head->key.str, head->value);
+	printf("%*c%d:%.*s = %d\n", depth * 4, 0, head->height, (int)head->key.size, (char *)head->key.str, head->value);
 
 	dict_print(head->left, depth + 1);
 	dict_print(head->right, depth + 1);
