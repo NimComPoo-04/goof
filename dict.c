@@ -4,16 +4,19 @@
 
 #include "dict.h"
 
-uint16_t *dict_find(dict_node_t *head, pair_t key)
+int16_t dict_find(dict_node_t *head, pair_t key)
 {
+	if(key.size <= 1)
+		return key.str[0];
+
 	if(head == NULL)
-		return NULL;
+		return -1;
 
 	int c = head->key.size - key.size;
 	c = (c == 0 ? memcmp(head->key.str, key.str, key.size) : c);
 
 	if(c == 0)
-		return &head->value;
+		return head->value;
 	else if(c < 0)
 		return dict_find(head->left, key);
 	else

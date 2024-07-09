@@ -18,7 +18,7 @@ typedef struct dict_node_t
 	struct dict_node_t *right;
 } dict_node_t;
 
-uint16_t *dict_find(dict_node_t *head, pair_t key);
+int16_t dict_find(dict_node_t *head, pair_t key);
 int dict_insert(dict_node_t **head, pair_t key, uint16_t value);
 
 void dict_print(dict_node_t *head, int depth);

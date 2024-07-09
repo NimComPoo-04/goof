@@ -17,6 +17,6 @@ typedef struct
 } lzw_t;
 
 uint16_t lzw_encoder_gencode(lzw_t *lz);
-uint16_t *lzw_encode(lzw_t *lz, size_t *s);
+uint8_t *lzw_encode(lzw_t *lz, size_t *s);
 
 #endif

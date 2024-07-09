@@ -4,16 +4,16 @@
 
 #include "lzw.h"
 
-char *convbin(uint16_t a);
+char *convbin(unsigned int a, int);
 
 uint16_t lzw_encoder_gencode(lzw_t *lz)
 {
 	pair_t p = {lz->raw_data + lz->cursor, 1};
 
-	uint16_t *value = NULL;
-	uint16_t *old_value = NULL;
+	int16_t value = 0;
+	int16_t old_value = 0;
 
-	while((value = dict_find(lz->table, p)))
+	while((value = dict_find(lz->table, p)) >= 0)
 	{
 		p.size++;
 		lz->cursor++;
@@ -24,75 +24,80 @@ uint16_t lzw_encoder_gencode(lzw_t *lz)
 	if(lz->value <= 4095)
 	{
 		dict_insert(&lz->table, p, lz->value++);
-		// lz->cursor--;
 	}
 
-	return *old_value;
+	return old_value;
 }
 
-uint16_t *lzw_encode(lzw_t *lz, size_t *size)
+
+uint8_t *lzw_encode(lzw_t *lz, size_t *size)
 {
 	uint16_t *stream = NULL;
+	int count = 0;
 
-	uint8_t code_size = lz->code_size;
+#define INSERT(a)\
+	do {\
+		if(count % 16 == 0)\
+			stream = realloc(stream, sizeof(uint16_t) * (count + 16));\
+		stream[count++] = (a);\
+	} while(0);
 
+	int bitpos = 0;
+
+	uint16_t packing = 0;
 	uint16_t code = 0;
-	uint16_t packed = 0;
-
-	uint16_t bitpos = 0;	// bit position in the new array
-	uint8_t rem = 0;
-	char k = 0;
 
 	while(lz->cursor < lz->raw_data_size)
 	{
-		assert(!(bitpos && rem));
-		if(rem)
-		{
-			packed |= code << bitpos;
-			bitpos += rem;
-			rem = 0;
-		}
+		code = lzw_encoder_gencode(lz);	
+		if(code >= 1 << lz->code_size)
+			lz->code_size++;
 
-		// getting new code
-		code = lzw_encoder_gencode(lz);
+		printf("%s \n", convbin(code, lz->code_size));
 
-		//printf("%s ", convbin(code));
-
-		if(code >= (1 << code_size))
-			code_size++;
-
-		// filling up the value
-		packed |= code << bitpos;
-		bitpos += code_size;
-
-		k = 0;
+		packing |= code << bitpos;
+		bitpos += lz->code_size;
 
 		if(bitpos >= 16)
 		{
-			rem = bitpos % 16;
-			code >>= code_size - rem;
-			bitpos = 0;
-			k = 1;
-		}
-		else
-		{
-			rem = 0;
-		}
+			//printf("p:%s \n", convbin(packing, 16));
+			INSERT(packing);
 
-		if(k)
-		{
-			if(*size % 16 == 0)
-				stream = realloc(stream, sizeof(uint16_t) * (*size + 16));
-			stream[(*size)++] = packed;
-			packed = 0;
+			bitpos -= 16;		         // re-evaluate bitopose
+			code >>= lz->code_size - bitpos; // drop already read portion
+			packing = code;
+			//printf("p:%s \n", convbin(packing, 16));
 		}
 	}
 
+	if(bitpos > 0)
+		INSERT(packing);
 
-	if(*size % 16 == 0)
-		stream = realloc(stream, sizeof(uint16_t) * (*size + 16));
-	stream[(*size)++] = packed;
-	packed = 0;
+#undef INSERT
 
-	return stream;
+	*size = count * 2 - (bitpos > 0);
+	return (uint8_t *)stream;
+}
+
+// LSB first then
+char *convbin(unsigned int a, int code_size)
+{
+	assert(code_size < 32);
+	static char bin[32];
+
+	/*
+	sprintf(bin, "%d ", a);
+	return bin;
+	*/
+
+	int i = 0;
+	while(i < code_size)
+	{
+		bin[i] = (a & 1) + '0';
+		a >>= 1;
+		i++;
+	}
+	bin[i] = 0;
+	
+	return bin;
 }
