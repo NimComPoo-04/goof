@@ -5,7 +5,20 @@
 #include "dict.h"
 #include "lzw.h"
 
-uint8_t value[] = "TO BE OR NOT TO BE OR TO BE OR NOT TO BE OR NOT TO BE#";
+#include "image.h"
+
+#if 1
+int main(void)
+{
+	image_t i = image_load("test.ppm");
+	image_genpalette(&i);
+	image_dither(&i);
+	image_write(&i, "out.ppm");
+}
+
+# else
+
+uint8_t value[] = "TOBEORNOTTOBEORTOBEORNOT#";
 
 char *convbin(uint16_t a)
 {
@@ -35,9 +48,11 @@ int main(void)
 		.cursor = 0
 	};
 
+	/*
 	for(size_t i = 0; i < sizeof alph / sizeof alph[0] - 1; i++)
 		dict_insert(&lz.table, (pair_t){alph + i, 1}, lz.value++);
 
+		*/
 	size_t s = 0;
 	uint16_t *codes = lzw_encode(&lz, &s);
 
@@ -53,3 +68,5 @@ int main(void)
 
 	return 0;
 }
+
+#endif
