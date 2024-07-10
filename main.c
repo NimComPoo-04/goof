@@ -12,7 +12,6 @@ char *convbin(unsigned int a, int);
 
 int main(void)
 {
-	/*
 	image_t i = image_load("tests/test.ppm");
 	image_genpalette(&i);
 	image_dither(&i);
@@ -20,7 +19,6 @@ int main(void)
 	
 	gif_write(&i, "out.gif");
 	gif_infodump(&i);
-	*/
 
 	/*
 	static uint8_t testbed[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
