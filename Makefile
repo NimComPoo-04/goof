@@ -4,15 +4,13 @@ CFLAGS = -Wall -Wextra -ggdb -std=c11
 SRC = $(wildcard *.c)
 OBJ = $(patsubst %.c, %.o, $(SRC))
 
-RAYLIB = ~/opt/raylib-5.0_linux_amd64
-
 all: goof
 
 goof: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ -L $(RAYLIB)/lib -lraylib -lm
+	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $^ -I $(RAYLIB)/include
+	$(CC) $(CFLAGS) -c -o $@ $^
 
 clean:
 	rm -rf *.o goof
