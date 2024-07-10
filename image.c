@@ -3,6 +3,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include <raylib.h>
+
 #include "image.h"
 
 image_t image_load(const char *file_name)
@@ -123,4 +125,3 @@ void image_write(image_t *img, const char *file_name)
 	fwrite(img->data, img->width * img->height, sizeof(uint8_t) * 3, f);
 	fclose(f);
 }
-

@@ -140,6 +140,24 @@ int dict_insert(dict_node_t **head, pair_t key, uint16_t value)
 	return k;
 }
 
+// Linear search since by value
+pair_t *dict_find_by_value(dict_node_t *head, uint16_t key)
+{
+	if(head == NULL)
+		return NULL;
+
+	if(head->value == key)
+		return &head->key;
+
+	pair_t *p = dict_find_by_value(head->left, key);
+	if(!p)
+	{
+		p = dict_find_by_value(head->right, key);
+		return p;
+	}
+	return p;
+}
+
 void dict_print(dict_node_t *head, int depth)
 {
 	if(head == NULL) return;
@@ -148,4 +166,13 @@ void dict_print(dict_node_t *head, int depth)
 
 	dict_print(head->left, depth + 1);
 	dict_print(head->right, depth + 1);
+}
+
+void dict_clear(dict_node_t *head)
+{
+	if(head == NULL)
+		return;
+	dict_clear(head->left);
+	dict_clear(head->right);
+	free(head);
 }

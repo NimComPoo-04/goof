@@ -21,6 +21,9 @@ typedef struct dict_node_t
 int16_t dict_find(dict_node_t *head, pair_t key);
 int dict_insert(dict_node_t **head, pair_t key, uint16_t value);
 
+pair_t *dict_find_by_value(dict_node_t *head, uint16_t key);
+
 void dict_print(dict_node_t *head, int depth);
+void dict_clear(dict_node_t *head);
 
 #endif
