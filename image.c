@@ -3,8 +3,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include <raylib.h>
-
 #include "image.h"
 
 image_t image_load(const char *file_name)

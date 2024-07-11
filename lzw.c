@@ -11,12 +11,6 @@ extern uint16_t GIF_END_OF_INFO;
 
 uint16_t lzw_encoder_gencode(lzw_t *lz)
 {
-	if(lz->cursor >= lz->raw_data_size)
-	{
-		lz->cursor++;
-		return GIF_END_OF_INFO;
-	}
-
 	if(lz->value == (1 << 12))
 	{
 		dict_clear(lz->table);
@@ -31,6 +25,12 @@ uint16_t lzw_encoder_gencode(lzw_t *lz)
 		return GIF_CLEAR_CODE;
 	}
 
+	if(lz->cursor >= lz->raw_data_size)
+	{
+		lz->cursor++;
+		return GIF_END_OF_INFO;
+	}
+
 	pair_t p = {lz->raw_data + lz->cursor, 1};
 
 	int16_t value = 0;
@@ -43,8 +43,10 @@ uint16_t lzw_encoder_gencode(lzw_t *lz)
 		old_value = value;
 	}
 
-	if(lz->value < (1 << 12) - 1)
+	if(lz->value < (1 << 12))
 	{
+		if(lz->value >= (1 << lz->code_size))
+			lz->code_size++;
 		dict_insert(&lz->table, p, lz->value++);
 	}
 
@@ -64,6 +66,7 @@ uint8_t *lzw_encode(lzw_t *lz, size_t *size)
 	} while(0);
 
 	int bitpos = 0;
+	uint16_t code_size = lz->code_size;
 
 	uint16_t packing = 0;
 	uint16_t code = 0;
@@ -71,11 +74,10 @@ uint8_t *lzw_encode(lzw_t *lz, size_t *size)
 	while(lz->cursor <= lz->raw_data_size)
 	{
 		code = lzw_encoder_gencode(lz);	
-
-		printf("%s", convbin(code, lz->code_size));
+		//printf("%s", convbin(code, lz->code_size));
 
 		packing |= code << bitpos;
-		bitpos += lz->code_size;
+		bitpos += code_size;
 
 		if(bitpos >= 16)
 		{
@@ -83,13 +85,12 @@ uint8_t *lzw_encode(lzw_t *lz, size_t *size)
 			INSERT(packing);
 
 			bitpos -= 16;		         // re-evaluate bitopose
-			code >>= lz->code_size - bitpos; // drop already read portion
+			code >>= code_size - bitpos; // drop already read portion
 			packing = code;
 			//printf("p:%s \n", convbin(packing, 16));
 		}
 
-		if(lz->value == (1 << lz->code_size) + 1)
-			lz->code_size++;
+		code_size = lz->code_size;
 	}
 
 	if(bitpos > 0)

@@ -15,7 +15,7 @@ int main(void)
 	image_t i = image_load("tests/test.ppm");
 	image_genpalette(&i);
 	image_dither(&i);
-	image_write(&i, "tests/out.ppm");
+	//image_write(&i, "tests/out.ppm");
 	
 	gif_write(&i, "out.gif");
 	gif_infodump(&i);

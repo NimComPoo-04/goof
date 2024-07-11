@@ -12,7 +12,7 @@ void gif_write(image_t *img, const char *file)
 {
 	FILE *f = fopen(file, "wb+");
 
-	fprintf(f, "GIF87a");
+	fprintf(f, "GIF89a");
 
 	fwrite(&img->width, sizeof img->width, 1, f);		// Image Logical Width
 	fwrite(&img->height, sizeof img->height, 1, f);		// Image Logical height
@@ -53,23 +53,9 @@ void gif_write(image_t *img, const char *file)
 		uint8_t blksize = (size - l > 255 ? 255 : size - l);
 		fwrite(&blksize, sizeof blksize, 1, f);
 
-		for(int j = 0; j < 15; j++)
-		{
-			for(int k = 0; k < 17; k++)
-			{
-				if(l >= size)
-				{
-					goto OUT;
-				}
-
-				fwrite(codes + l, 1, 1, f);
-				l++;
-			}
-		}
+		fwrite(codes + l, blksize, 1, f);
+		l+= blksize;
 	}
-OUT:
-
-//	fwrite(&GIF_END_OF_INFO, sizeof GIF_END_OF_INFO, 1, f);
 
 	fwrite("\x00", 1, 1, f);
 	fwrite("\x3B", 1, 1, f);
@@ -139,6 +125,5 @@ OUT:
 	puts("");
 
 	printf("Block Size: %d\n", 0);
-
 	printf("Terminal Code: %2x\n", ';');
 }
