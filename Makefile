@@ -7,7 +7,10 @@ OBJ = $(patsubst %.c, %.o, $(SRC))
 all: goof
 
 goof: $(OBJ)
+<<<<<<< HEAD
 	$(CC) $(CFLAGS) -o $@ $^
+=======
+>>>>>>> origin/main
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
