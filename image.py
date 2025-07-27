@@ -1,5 +1,9 @@
 from lzw import *
 
+R = 8
+G = 8
+B = 4
+
 class PPMImage:
     def __init__(self, name):
         f = open(name, "rb")
@@ -13,12 +17,12 @@ class PPMImage:
         self.codes = bytearray()
 
         self.colormap = bytearray()
-        for i in range(0, 8):
-            for j in range(0, 8):
-                for k in range(0, 4):
-                    self.colormap.append((256 // 8) * i)
-                    self.colormap.append((256 // 8) * j)
-                    self.colormap.append((256 // 4) * k)
+        for i in range(0, R):
+            for j in range(0, G):
+                for k in range(0, B):
+                    self.colormap.append((256 // R) * i)
+                    self.colormap.append((256 // G) * j)
+                    self.colormap.append((256 // B) * k)
 
         f.close()
 
@@ -69,11 +73,11 @@ class PPMImage:
 
 
     def quant(self, r, g, b):
-        i = r * 8 // 256
-        j = g * 8 // 256
-        k = b * 4 // 256
+        i = r * R // 256
+        j = g * G // 256
+        k = b * B // 256
 
-        f = i * 32 + j * 4 + k
+        f = i * (G * B) + j * B + k
         self.codes.append(f)
         t = 3 * f
         return self.colormap[t], self.colormap[t + 1], self.colormap[t + 2]

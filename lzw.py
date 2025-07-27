@@ -15,7 +15,7 @@ def lzw_encode_gencode(table, maxvalue, raw, current):
             current = current + 1
             win.append(raw[current])
 
-        if(maxvalue < 4096):
+        if(maxvalue < (1 << 12)):
             table[bytes(win)] = maxvalue
             maxvalue = maxvalue + 1
 
@@ -48,12 +48,13 @@ def lzw_encode_pack(table, raw, minsiz):
 
     while current < len(raw):
         code, maxvalue, current = lzw_encode_gencode(table, maxvalue, raw, current)
+
         codes |= code << pos
 
-        pos += minsiz
-
-        if maxvalue == (1 << minsiz) + 1:
+        if maxvalue == (1 << minsiz) + 2:
             minsiz += 1
+
+        pos += minsiz
 
     return codes, math.ceil(pos / 8)
 
